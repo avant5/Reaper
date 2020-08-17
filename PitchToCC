@@ -1,0 +1,32 @@
+desc:PitchWheel to CC
+// Author: Avant 5 Multimedia
+// Special thanks to Robert Randolph for the tutorial that helped this become reality
+// https://www.admiralbumblebee.com/music/2018/02/08/Write-a-Reaper-MIDI-JSFX-from-scratch.html
+
+// Parameter to set which CC controller to use.  Default CC:3
+slider1:3<0,127,1>CC to Send
+
+// Default constants
+@init
+noteOn=0x90;
+cc=0xB0;
+
+// Set up controller knobs
+@slider
+ccValue = slider1;
+
+@block
+while (midirecv(offset,msg1,msg2,msg3)) (
+
+  channel=msg1&0x0F;
+  noteStatus=msg1&0xF0;
+  currentNote=msg2;
+  ccMsg=currentNote;
+  
+  currentNote==0 ? (
+    midisend(offset,cc+channel,ccValue,msg3);
+  ) : (
+    midisend(offset,msg1,msg2,msg3);
+  );
+  
+);
